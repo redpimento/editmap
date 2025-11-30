@@ -1,1 +1,40 @@
+name: Sitemap Updater
 
+on:
+  schedule:
+    # 매일 오전 6시 00분 (KST)에 실행 (UTC 기준 21시)
+    - cron: '0 21 * * *' 
+  workflow_dispatch:
+    # 수동 실행을 허용합니다.
+
+jobs:
+  update_files:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          # 커밋을 위해 전체 히스토리가 필요합니다.
+          fetch-depth: 0 
+          
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+          
+      - name: Install dependencies
+        run: pip install requests
+        
+      - name: Execute Python script to fetch and fix files
+        run: python sitemap_fixer.py
+        
+      - name: Commit and Push changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          # 수정된 파일을 모두 커밋합니다.
+          commit_message: "Automated update: Fixed sitemap and rss files"
+          # 3단계에서 저장한 Secret을 토큰으로 사용합니다.
+          commit_user_name: 'redpimento' 
+          commit_user_email: 'redpimento@users.noreply.github.com' # GitHub의 no-reply 이메일을 사용합니다.
+          push_options: '--force' # 강제 푸시 옵션을 사용하여 확실히 업데이트합니다.
+          token: ${{ secrets.GH_TOKEN }} # Secret에서 GH_TOKEN 사용

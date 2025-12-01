@@ -19,7 +19,11 @@ def fetch_and_fix_file():
         
         try:
             # 1. 원본 파일 가져오기
-            response = requests.get(original_url, timeout=10)
+			# 🚨 수정된 부분: User-Agent 헤더를 추가하여 브라우저처럼 위장합니다.
+            headers = {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36'
+            }
+            response = requests.get(original_url, headers=headers, timeout=10)
             response.raise_for_status() # HTTP 오류 발생 시 예외 발생
             
             content = response.text
